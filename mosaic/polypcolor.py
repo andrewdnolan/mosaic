@@ -1,10 +1,10 @@
+import numpy as np
+
 from matplotlib.axes import Axes
 from matplotlib.collections import PolyCollection
 from matplotlib.colors import Normalize, Colormap
 from mosaic.descriptor import Descriptor
-
 from numpy.typing import ArrayLike
-
 from xarray.core.dataarray import DataArray
 
 
@@ -18,6 +18,7 @@ def polypcolor(
     vmin: float | None = None,
     vmax: float | None = None,
     facecolors: ArrayLike | None = None,
+    transform = None,
     **kwargs
     ) -> PolyCollection:
     """
@@ -56,35 +57,21 @@ def polypcolor(
 
     elif "nVertices" in c.dims:
         verts = descriptor.vertex_patches
+    
+    transform = descriptor.get_transform()
 
-    collection = PolyCollection(verts, alpha=alpha, array=c,
-                                cmap=cmap, norm=norm, **kwargs)
-
+    collection = PolyCollection(verts, alpha=alpha, array=c, closed=True,
+                                cmap=cmap, **kwargs)
+    
+    collection.set_array(c)
+    collection.set_transform(transform)
     collection._scale_norm(norm, vmin, vmax)
     
-    # get the limits of the **data**, which could exceed the valid
-    # axis limits of the transform
-    minx = verts[..., 0].min()
-    maxx = verts[..., 0].max()
-    miny = verts[..., 1].min()
-    maxy = verts[..., 1].max()
-  
-    corners = (minx, miny), (maxx, maxy)
-    ax.update_datalim(corners)
-    ax._request_autoscale_view()
     ax.add_collection(collection)
-    
-    # if data has been transformed use the transforms x-limits.
-    # patches have vertices that exceed the transfors x-limits to visually
-    # correct the antimeridian problem
-    if descriptor.projection:
-        minx = descriptor.projection.x_limits[0]
-        maxx = descriptor.projection.x_limits[1]
 
-        miny = descriptor.projection.y_limits[0]
-        maxy = descriptor.projection.y_limits[1]
-     
-        ax.set_xbound(minx, maxx)
-        ax.set_ybound(miny, maxy)
+    # Update the datalim for this polycollection
+    limits = collection.get_datalim(ax.transData)
+    ax.update_datalim(limits)
+    ax.autoscale_view()
 
     return collection
