@@ -41,13 +41,14 @@ class Descriptor:
 
     vertex_patches : :py:class:`numpy.ndarray`
     """
-    def __init__(self, ds, projection=None, transform=None, use_latlon=False): 
+    def __init__(self, ds, projection=None, transform=None, use_latlon=True): 
         """
         """
         self.latlon     = use_latlon
         self.projection = projection
         self.transform  = transform
-
+        self._pre_projected = False
+    
         # if mesh is on a sphere, force the use of lat lon coords
         if ds.attrs["on_a_sphere"].strip().upper() == 'YES':
             self.latlon = True
@@ -55,11 +56,12 @@ class Descriptor:
         
         # create a minimal dataset, stored as an attr, for patch creation
         self.ds = self.create_minimal_dataset(ds) 
-
+        
         # reproject the minimal dataset, even for non-spherical meshes
         if projection and transform: 
             self._transform_coordinates(projection, transform)
-        
+            self._pre_projected = True
+
     def create_minimal_dataset(self, ds): 
         """
         Create a xarray.Dataset that contains the minimal subset of 
@@ -113,6 +115,15 @@ class Descriptor:
         patches = self._fix_antimeridian(patches, "Vertex")
         return patches
 
+    def get_transform(self):
+
+        if self._pre_projected:
+            transform = self.projection
+        else:
+            transform = self.transform
+        
+        return transform
+
     def _transform_coordinates(self, projection, transform):
         """
         """
@@ -150,42 +161,21 @@ class Descriptor:
             #       carefull about the fillvalue depending on the transform
             half_distance = x_center[:, np.newaxis] - patches[...,0].data
 
+            period = np.abs(projection.x_limits[1] - projection.x_limits[0])
+
             # get the size limit of the projection; 
-            size_limit = np.abs(projection.x_limits[1] -
-                                projection.x_limits[0]) / (2 * np.sqrt(2))
+            size_limit = period / (2 * np.sqrt(2))
     
             # left and right mask, with same number of dims as the patches
-            l_mask = (half_distance > size_limit)[..., np.newaxis]
-            r_mask = (half_distance < -size_limit)[..., np.newaxis]
+            l_mask = (half_distance >= size_limit)
+            r_mask = (half_distance < -size_limit)
 
-            """ 
-            # Old approach masks out all patches that cross the antimeridian. 
-            # This is unnessarily restrictive. New approach corrects 
-            # the x-coordinates of vertices that lie outside the projections
-            # bounds, which isn't perfect either
-
-            patches.mask |= l_mask
-            patches.mask |= r_mask
-            """
-
-            # get valid half distances for the patches that cross boundary
-            l_offset = np.ma.MaskedArray(half_distance,
-                                         ~np.any(l_mask, axis=1) | l_mask[...,0])
-            r_offset = np.ma.MaskedArray(half_distance,
-                                         ~np.any(r_mask, axis=1) | r_mask[...,0])
+            self.l_mask = l_mask
+            self.r_mask = r_mask
             
-            # For vertices that cross the antimeridian reset the x-coordinate
-            # of invalid vertex to be the center of the patch plus the
-            # mean valid half distance. 
-            # 
-            # NOTE: this only fixes patches on the side of plot where they
-            # cross the antimeridian, leaving an empty zipper like pattern 
-            # mirrored over the y-axis. 
-            patches[...,0] = np.ma.where(~l_mask[...,0], patches[...,0],
-                x_center[:, np.newaxis] + l_offset.mean(1)[...,np.newaxis])
-            patches[...,0] = np.ma.where(~r_mask[...,0], patches[...,0],
-                x_center[:, np.newaxis] + r_offset.mean(1)[...,np.newaxis])
-                                         
+            patches[l_mask, 0] += period
+            patches[r_mask, 0] -= period
+
         return patches
 
     def transform_patches(self, patches, projection, transform):
@@ -204,74 +194,90 @@ class Descriptor:
 
 def _compute_cell_patches(ds):
     
+    maxEdges = ds.sizes["maxEdges"]
+
     # get a mask of the active vertices
     mask = ds.verticesOnCell == 0
     
     # get the coordinates needed to patch construction
-    xVertex = ds.xVertex
-    yVertex = ds.yVertex
+    xVertex = ds.xVertex.values
+    yVertex = ds.yVertex.values
     
     # account for zero indexing
     verticesOnCell = ds.verticesOnCell - 1
+    firstVertex = np.tile(verticesOnCell[:,0], (maxEdges,1)).T 
+    verticesOnCell = np.where(mask, firstVertex, verticesOnCell)
 
     # reshape/expand the vertices coordinate arrays
-    x_vert = np.ma.MaskedArray(xVertex[verticesOnCell], mask=mask)
-    y_vert = np.ma.MaskedArray(yVertex[verticesOnCell], mask=mask)
+    x_vert = xVertex[verticesOnCell]
+    y_vert = yVertex[verticesOnCell]
 
-    verts = np.ma.stack((x_vert, y_vert), axis=-1)
+    verts = np.stack((x_vert, y_vert), axis=-1)
 
     return verts
 
 def _compute_edge_patches(ds, latlon=False):
     
+    TWO = ds.sizes["TWO"]
+
     # account for zeros indexing
     cellsOnEdge = ds.cellsOnEdge - 1
     verticesOnEdge = ds.verticesOnEdge - 1
     
     # is this masking sufficent ?
-    cellMask = cellsOnEdge <= 0
-    vertexMask = verticesOnEdge <= 0
+    cellMask = cellsOnEdge < 0
+    vertexMask = verticesOnEdge < 0
+
+    firstCellVertex = np.tile(cellsOnEdge[:,0], (TWO,1)).T 
+    firstVertexVertex = np.tile(verticesOnEdge[:,0], (TWO,1)).T 
+
+    cellsOnEdge    = np.where(cellMask, firstCellVertex, cellsOnEdge)
+    verticesOnEdge = np.where(vertexMask, firstVertexVertex, verticesOnEdge)
 
     # get the coordinates needed to patch construction
-    xCell = ds.xCell
-    yCell = ds.yCell
-    xVertex = ds.xVertex
-    yVertex = ds.yVertex
+    xCell = ds.xCell.values
+    yCell = ds.yCell.values
+    xVertex = ds.xVertex.values
+    yVertex = ds.yVertex.values
 
     # get subset of cell coordinate arrays corresponding to edge patches
-    xCell = np.ma.MaskedArray(xCell[cellsOnEdge], mask=cellMask)
-    yCell = np.ma.MaskedArray(yCell[cellsOnEdge], mask=cellMask)
+    xCell = xCell[cellsOnEdge]
+    yCell = yCell[cellsOnEdge]
     # get subset of vertex coordinate arrays corresponding to edge patches
-    xVertex = np.ma.MaskedArray(xVertex[verticesOnEdge], mask=vertexMask)
-    yVertex = np.ma.MaskedArray(yVertex[verticesOnEdge], mask=vertexMask)
+    xVertex = xVertex[verticesOnEdge]
+    yVertex = yVertex[verticesOnEdge]
 
-    x_vert = np.ma.stack((xCell[:,0], xVertex[:,0],
-                          xCell[:,1], xVertex[:,1]), axis=-1)
+    x_vert = np.stack((xCell[:,0], xVertex[:,0],
+                       xCell[:,1], xVertex[:,1]), axis=-1)
     
-    y_vert = np.ma.stack((yCell[:,0], yVertex[:,0],
-                          yCell[:,1], yVertex[:,1]), axis=-1)
+    y_vert = np.stack((yCell[:,0], yVertex[:,0],
+                       yCell[:,1], yVertex[:,1]), axis=-1)
 
     
-    verts = np.ma.stack((x_vert, y_vert), axis=-1)
+    verts = np.stack((x_vert, y_vert), axis=-1)
 
     return verts
 
 def _compute_vertex_patches(ds, latlon=False):
     
+    vertexDegree = ds.sizes["vertexDegree"]
+
     # get a mask of the active vertices
     mask = ds.cellsOnVertex == 0
     
     # get the coordinates needed to patch construction
-    xCell = ds.xCell
-    yCell = ds.yCell
+    xCell = ds.xCell.values
+    yCell = ds.yCell.values
     
     # account for zero indexing
     cellsOnVertex = ds.cellsOnVertex - 1
+    firstVertex = np.tile(cellsOnVertex[:,0], (vertexDegree,1)).T 
+    cellsOnVertex = np.where(mask, firstVertex, cellsOnVertex)
 
     # reshape/expand the vertices coordinate arrays
-    x_vert = np.ma.MaskedArray(xCell[cellsOnVertex], mask=mask)
-    y_vert = np.ma.MaskedArray(yCell[cellsOnVertex], mask=mask)
+    x_vert = xCell[cellsOnVertex]
+    y_vert = yCell[cellsOnVertex]
 
-    verts = np.ma.stack((x_vert, y_vert), axis=-1)
+    verts = np.stack((x_vert, y_vert), axis=-1)
 
     return verts
