@@ -169,12 +169,16 @@ class Descriptor:
             # left and right mask, with same number of dims as the patches
             l_mask = (half_distance >= size_limit)
             r_mask = (half_distance < -size_limit)
-
+            
+            # get the y-coordinate of the vertices that cross antimeridian
+            l_period = get_projection_period(projection, patches[l_mask,  1])
+            r_period = get_projection_period(projection, patches[r_mask,  1])
+            
             self.l_mask = l_mask
             self.r_mask = r_mask
             
-            patches[l_mask, 0] += period
-            patches[r_mask, 0] -= period
+            patches[l_mask, 0] += l_period
+            patches[r_mask, 0] -= r_period
 
         return patches
 
@@ -296,3 +300,20 @@ def _compute_vertex_patches(ds, latlon=False):
     verts = np.stack((x_vert, y_vert), axis=-1)
 
     return verts
+
+
+def get_projection_period(proj, ys): 
+    
+    geo = proj.as_geodetic()
+
+    n = ys.shape[0]
+    
+    dummy_x = sum(proj.x_limits) / 2.
+    #first convert the input y's to lat/lon 
+    lats = geo.transform_points(proj, np.repeat(dummy_x, n), ys)[:,1]
+    
+    # get the x postion in projection coordinate at left/right boundaries
+    xmins = proj.transform_points(geo, np.repeat(-180, n), lats)[:,0]
+    xmaxs = proj.transform_points(geo, np.repeat(180,  n), lats)[:,0]
+    
+    return xmaxs - xmins
