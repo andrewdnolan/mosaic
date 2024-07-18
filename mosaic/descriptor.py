@@ -195,17 +195,22 @@ class Descriptor:
 def _compute_cell_patches(ds):
     
     maxEdges = ds.sizes["maxEdges"]
+    
+    # insert the first vertex as the last, so that all polygons are closed
+    verticesOnCell = np.hstack((ds.verticesOnCell, ds.verticesOnCell[:,0:1]))
 
     # get a mask of the active vertices
-    mask = ds.verticesOnCell == 0
+    mask = verticesOnCell == 0
     
     # get the coordinates needed to patch construction
     xVertex = ds.xVertex.values
     yVertex = ds.yVertex.values
     
     # account for zero indexing
-    verticesOnCell = ds.verticesOnCell - 1
-    firstVertex = np.tile(verticesOnCell[:,0], (maxEdges,1)).T 
+    verticesOnCell = verticesOnCell - 1
+    # tile the first vertices index
+    firstVertex = np.tile(verticesOnCell[:, 0], (maxEdges + 1, 1)).T 
+    # set masked cell indicies to the first index of the polygon
     verticesOnCell = np.where(mask, firstVertex, verticesOnCell)
 
     # reshape/expand the vertices coordinate arrays
@@ -220,18 +225,21 @@ def _compute_edge_patches(ds, latlon=False):
     
     TWO = ds.sizes["TWO"]
 
+    cellsOnEdge = ds.cellsOnEdge
+    verticesOnEdge = ds.verticesOnEdge
+
+    # get a mask of the active vertices
+    cellMask = cellsOnEdge == 0
+    vertexMask = verticesOnEdge == 0
+
     # account for zeros indexing
-    cellsOnEdge = ds.cellsOnEdge - 1
-    verticesOnEdge = ds.verticesOnEdge - 1
-    
-    # is this masking sufficent ?
-    cellMask = cellsOnEdge < 0
-    vertexMask = verticesOnEdge < 0
-
-    firstCellVertex = np.tile(cellsOnEdge[:,0], (TWO,1)).T 
-    firstVertexVertex = np.tile(verticesOnEdge[:,0], (TWO,1)).T 
-
-    cellsOnEdge    = np.where(cellMask, firstCellVertex, cellsOnEdge)
+    cellsOnEdge = cellsOnEdge - 1
+    verticesOnEdge = verticesOnEdge - 1
+    # tile the first vertices index
+    firstCellVertex = np.tile(cellsOnEdge[:, 0], (TWO, 1)).T 
+    firstVertexVertex = np.tile(verticesOnEdge[:, 0], (TWO, 1)).T 
+    # set masked cell indicies to the first index of the polygon
+    cellsOnEdge = np.where(cellMask, firstCellVertex, cellsOnEdge)
     verticesOnEdge = np.where(vertexMask, firstVertexVertex, verticesOnEdge)
 
     # get the coordinates needed to patch construction
@@ -247,13 +255,15 @@ def _compute_edge_patches(ds, latlon=False):
     xVertex = xVertex[verticesOnEdge]
     yVertex = yVertex[verticesOnEdge]
 
+    # manually insert first vertex as the last, so that polygons are closed
     x_vert = np.stack((xCell[:,0], xVertex[:,0],
-                       xCell[:,1], xVertex[:,1]), axis=-1)
+                       xCell[:,1], xVertex[:,1],
+                       xCell[:,0]), axis=-1)
     
     y_vert = np.stack((yCell[:,0], yVertex[:,0],
-                       yCell[:,1], yVertex[:,1]), axis=-1)
+                       yCell[:,1], yVertex[:,1],
+                       yCell[:,0]), axis=-1)
 
-    
     verts = np.stack((x_vert, y_vert), axis=-1)
 
     return verts
@@ -262,16 +272,21 @@ def _compute_vertex_patches(ds, latlon=False):
     
     vertexDegree = ds.sizes["vertexDegree"]
 
+    # insert the first vertex as the last, so that all polygons are closed
+    cellsOnVertex = np.hstack((ds.cellsOnVertex, ds.cellsOnVertex[:, 0:1]))
+
     # get a mask of the active vertices
-    mask = ds.cellsOnVertex == 0
+    mask = cellsOnVertex == 0
     
     # get the coordinates needed to patch construction
     xCell = ds.xCell.values
     yCell = ds.yCell.values
     
     # account for zero indexing
-    cellsOnVertex = ds.cellsOnVertex - 1
-    firstVertex = np.tile(cellsOnVertex[:,0], (vertexDegree,1)).T 
+    cellsOnVertex = cellsOnVertex - 1
+    # tile the first vertices index
+    firstVertex = np.tile(cellsOnVertex[:, 0], (vertexDegree + 1, 1)).T 
+    # set masked cell indicies to the first index of the polygon
     cellsOnVertex = np.where(mask, firstVertex, cellsOnVertex)
 
     # reshape/expand the vertices coordinate arrays
