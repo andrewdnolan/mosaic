@@ -179,7 +179,7 @@ class Descriptor:
             
             patches[l_mask, 0] += l_period
             patches[r_mask, 0] -= r_period
-
+            
         return patches
 
     def transform_patches(self, patches, projection, transform):
@@ -303,8 +303,10 @@ def _compute_vertex_patches(ds, latlon=False):
 
 
 def get_projection_period(proj, ys): 
-    
-    geo = proj.as_geodetic()
+
+    import cartopy.crs as ccrs
+
+    geo = ccrs.Geodetic()
 
     n = ys.shape[0]
     

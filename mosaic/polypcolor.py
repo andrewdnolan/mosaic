@@ -1,5 +1,6 @@
 import numpy as np
 
+from cartopy.mpl.geoaxes import GeoAxes
 from matplotlib.axes import Axes
 from matplotlib.collections import PolyCollection
 from matplotlib.colors import Normalize, Colormap
@@ -64,7 +65,11 @@ def polypcolor(
                                 cmap=cmap, **kwargs)
     
     collection.set_array(c)
-    collection.set_transform(transform)
+    
+    # only set the transform if GeoAxes (i.e. has `set_transform` method)
+    if isinstance(ax, GeoAxes):
+        collection.set_transform(transform)
+
     collection._scale_norm(norm, vmin, vmax)
     
     ax.add_collection(collection)
