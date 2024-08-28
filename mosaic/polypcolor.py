@@ -1,5 +1,6 @@
 import numpy as np
 
+import cartopy.crs as ccrs
 from matplotlib.axes import Axes
 from matplotlib.collections import PolyCollection
 from matplotlib.colors import Normalize, Colormap
@@ -49,8 +50,26 @@ def polypcolor(
             for :py:func:`matplotlib.pyplot.pcolor`. 
     """
 
+    # Do some special handling to deal with wrapping/interpolation
+    collection = _wrap_polypcolor(ax, descriptor, c,
+                                  alpha, norm, cmap, vmin, vmax,
+                                  facecolors, transform, **kwargs)
+
+    # Update the datalim for this polycollection
+    limits = collection.get_datalim(ax.transData)
+    ax.update_datalim(limits)
+    ax.autoscale_view()
+
+    return collection
+
+def _wrap_polypcolor(ax, descriptor, c, alpha, norm, cmap, vmin, vmax,
+                     facecolors, transform, **kwargs):
+    
+    transform = descriptor.get_transform()
+
     if "nCells" in c.dims:
         verts = descriptor.cell_patches
+        boundary_mask = descriptor._boundaryCells
 
     elif "nEdges" in c.dims:
         verts = descriptor.edge_patches
@@ -58,20 +77,51 @@ def polypcolor(
     elif "nVertices" in c.dims:
         verts = descriptor.vertex_patches
     
-    transform = descriptor.get_transform()
-
-    collection = PolyCollection(verts, alpha=alpha, array=c, closed=True,
-                                cmap=cmap, **kwargs)
+    # in this case there are no patches that cross boundary 
+    if np.all(boundary_mask == False):
+        
+        collection = PolyCollection(verts, alpha=alpha, array=c, closed=True,
+                                    cmap=cmap, **kwargs)
+        
+        collection.set_array(c)
+        collection.set_transform(transform)
+        collection._scale_norm(norm, vmin, vmax)
     
-    collection.set_array(c)
+        ax.add_collection(collection)
+
+        return collection
+
+    # first create the collection on interior cells
+    collection = PolyCollection(verts[~boundary_mask],
+                                alpha=alpha,
+                                array=c[~boundary_mask],
+                                closed=True,
+                                cmap=cmap,
+                                **kwargs)
+    
+    collection.set_array(c[~boundary_mask])
     collection.set_transform(transform)
-    collection._scale_norm(norm, vmin, vmax)
-    
-    ax.add_collection(collection)
 
-    # Update the datalim for this polycollection
-    limits = collection.get_datalim(ax.transData)
-    ax.update_datalim(limits)
-    ax.autoscale_view()
+    ax.add_collection(collection)
+    
+    # transform the boundary cells to Geodetic crs
+    geo = ccrs.Geodetic()
+    
+    geo_patches = geo.transform_points(transform,
+                                       verts[boundary_mask,:,0],
+                                       verts[boundary_mask,:,1])[...,0:2] 
+
+    # first create the collection on interior cells
+    _geo_collection = PolyCollection(geo_patches,
+                                     alpha=alpha,
+                                     array=c[boundary_mask],
+                                     closed=True,
+                                     cmap=cmap,
+                                     **kwargs)
+    
+    _geo_collection.set_array(c[boundary_mask])
+    _geo_collection.set_transform(geo)
+
+    ax.add_collection(_geo_collection)
 
     return collection

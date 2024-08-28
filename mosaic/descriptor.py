@@ -100,13 +100,12 @@ class Descriptor:
     @cached_property
     def cell_patches(self):
         patches = _compute_cell_patches(self.ds)
-        patches = self._fix_antimeridian(patches, "Cell")
+        self._boundaryCells = self._find_boundary_patches(patches, "Cell") 
         return patches
 
     @cached_property
     def edge_patches(self):
         patches = _compute_edge_patches(self.ds)
-        patches = self._fix_antimeridian(patches, "Edge")
         return patches
 
     @cached_property
@@ -137,46 +136,35 @@ class Descriptor:
             self.ds[f"x{loc}"].values = transformed_coords[:, 0]
             self.ds[f"y{loc}"].values = transformed_coords[:, 1]
     
-    def _fix_antimeridian(self, patches, loc, projection=None): 
-        """Correct vertices of patches that cross the antimeridian. 
-
-        NOTE: Can this be a decorator? 
+    def _find_boundary_patches(self, patches, loc, projection=None): 
+        """Return mask of patches that cross the projection boundary 
+           (i.e. antimeridian)
         """
         # coordinate arrays are transformed at initalization, so using the 
         # transform size limit, not the projection 
         if not projection: 
             projection = self.projection
 
-        # should be able to come up with a default size limit here, or maybe
-        # it's already an attribute(?) Should also factor in a precomputed
-        # axis period, as set in the attributes of the input dataset
-        if projection: 
-            # convert to numpy array to that broadcasting below will work
-            x_center = np.array(self.ds[f"x{loc}"])
+        # TO DO: Need to handle non GeoAxes case (i.e. `projection==None`)
+        # convert to numpy array to that broadcasting below will work
+        x_center = np.array(self.ds[f"x{loc}"])
 
-            # get distance b/w the center and vertices of the patches
-            # NOTE: using data from masked patches array so that we compute
-            #       mask only corresponds to patches that cross the boundary, 
-            #       (i.e. NOT a mask of all invalid cells). May need to be 
-            #       carefull about the fillvalue depending on the transform
-            half_distance = x_center[:, np.newaxis] - patches[...,0].data
+        # get distance b/w the center and vertices of the patches
+        half_distance = x_center[:, np.newaxis] - patches[...,0].data
 
-            period = np.abs(projection.x_limits[1] - projection.x_limits[0])
+        # maximum period of projection, should be lattitude dependent
+        period = np.abs(projection.x_limits[1] - projection.x_limits[0])
 
-            # get the size limit of the projection; 
-            size_limit = period / (2 * np.sqrt(2))
+        # get the size limit of the projection; 
+        size_limit = period / (2 * np.sqrt(2))
     
-            # left and right mask, with same number of dims as the patches
-            l_mask = (half_distance >= size_limit)
-            r_mask = (half_distance < -size_limit)
+        # left and right mask, with same number of dims as the patches
+        l_mask = (half_distance >= size_limit)
+        r_mask = (half_distance < -size_limit)
 
-            self.l_mask = l_mask
-            self.r_mask = r_mask
-            
-            patches[l_mask, 0] += period
-            patches[r_mask, 0] -= period
+        boundaryMask = np.any(l_mask | r_mask, axis=1)
 
-        return patches
+        return boundaryMask
 
     def transform_patches(self, patches, projection, transform):
         """
