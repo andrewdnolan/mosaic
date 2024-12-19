@@ -21,7 +21,8 @@ connectivity_arrays = ["cellsOnEdge",
 
 
 def attr_to_bool(attr: str):
-    """ Format attribute strings and return a boolean value """
+    """Format attribute strings and return a boolean value
+    """
     match attr.strip().upper():
         case "YES":
             return True
@@ -185,7 +186,8 @@ class Descriptor:
 
     @property
     def projection(self) -> CRS:
-        """ The target projection for plotting. """
+        """The target projection for plotting.
+        """
         return self._projection
 
     @projection.setter
@@ -194,7 +196,7 @@ class Descriptor:
         # TODO: Add heuristic size (i.e. ``self.ds.nbytes``) above which the
         #       warning is raised
         if hasattr(self, "_projection"):
-            print(("Reprojecting the descriptor can be inefficient "
+            print(("Reprojecting the descriptor can be inefficient"
                    "for large meshes"))
 
         # If both a projection and a transform are provided then
@@ -205,7 +207,7 @@ class Descriptor:
             self.transform = projection
             # Then loop over patch attributes
             for loc in ["cell", "edge", "vertex"]:
-                attr = f"{loc}_patches"
+                attr = "f{loc}_patches"
                 # and only delete attributes that have previously been cached
                 if attr in self.__dict__:
                     del self.__dict__[attr]
@@ -214,15 +216,15 @@ class Descriptor:
 
     @property
     def latlon(self) -> bool:
-        """
-        Boolean whether the lat/lon coordinate arrays should be used for
+        """Boolean whether the lat/lon coordinate arrays should be used for
         patch construction.
         """
         return self._latlon
 
     @latlon.setter
     def latlon(self, value) -> None:
-        """ TODO: check that the passed value is consistent with transform """
+        """TODO: check that the passed value is consistent with transform
+        """
         if self.is_spherical:
             value = True
 
@@ -370,7 +372,8 @@ class Descriptor:
 
 
 def _compute_cell_patches(ds: Dataset) -> ndarray:
-    """Create cell patches (i.e. Primary cells) for an MPAS mesh."""
+    """Create cell patches (i.e. Primary cells) for an MPAS mesh.
+    """
     # get the maximum number of edges on a cell
     maxEdges = ds.sizes["maxEdges"]
     # connectivity arrays have already been zero indexed
@@ -393,7 +396,8 @@ def _compute_cell_patches(ds: Dataset) -> ndarray:
 
 
 def _compute_edge_patches(ds: Dataset) -> ndarray:
-    """Create edge patches for an MPAS mesh."""
+    """Create edge patches for an MPAS mesh.
+    """
 
     # connectivity arrays have already been zero indexed
     cellsOnEdge = ds.cellsOnEdge
@@ -426,7 +430,8 @@ def _compute_edge_patches(ds: Dataset) -> ndarray:
 
 
 def _compute_vertex_patches(ds: Dataset) -> ndarray:
-    """Create vertex patches (i.e. Dual Cells) for an MPAS mesh."""
+    """Create vertex patches (i.e. Dual Cells) for an MPAS mesh.
+    """
     nVertices = ds.sizes["nVertices"]
     vertexDegree = ds.sizes["vertexDegree"]
 
