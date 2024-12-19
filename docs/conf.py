@@ -3,9 +3,13 @@
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
+import inspect
 import mosaic
-from mosaic.version import __version__
+import os
+import sys
 from cartopy.io.shapereader import natural_earth
+
+import mosaic
 
 def download_meshes(app, env, docnames):
     """ Function to download meshes prior to executing documentation, so
@@ -31,7 +35,7 @@ def setup(app):
 project = 'mosaic'
 copyright = '2024, E3SM Development Team'
 author = 'E3SM Development Team'
-release = __version__
+release = mosaic.__version__
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -43,6 +47,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.autosummary',
     'sphinx.ext.intersphinx',
+    'sphinx.ext.linkcode',
     'sphinx.ext.napoleon',
     'sphinx_remove_toctrees',
 ]
@@ -112,3 +117,53 @@ napoleon_type_aliases = {
     "path-like": ":term:`path-like <path-like object>`",
     "string": ":class:`string <str>`",
 }
+
+# based on xarray doc/conf.py
+def linkcode_resolve(domain, info):
+    """
+    Determine the URL corresponding to Python object
+    """
+    if domain != "py":
+        return None
+
+    modname = info["module"]
+    fullname = info["fullname"]
+
+    submod = sys.modules.get(modname)
+    if submod is None:
+        return None
+
+    obj = submod
+    for part in fullname.split("."):
+        try:
+            obj = getattr(obj, part)
+        except AttributeError:
+            return None
+
+    try:
+        fn = inspect.getsourcefile(inspect.unwrap(obj))
+    except TypeError:
+        fn = None
+    if not fn:
+        return None
+
+    try:
+        source, lineno = inspect.getsourcelines(obj)
+    except OSError:
+        lineno = None
+
+    if lineno:
+        linespec = f"#L{lineno}-L{lineno + len(source) - 1}"
+    else:
+        linespec = ""
+
+    fn = os.path.relpath(fn, start=os.path.dirname(mosaic.__file__))
+
+    if "+" in mosaic.__version__:
+        return (f"https://github.com/E3SM-Project/mosaic/blob"
+                f"/main/mosaic/{fn}{linespec}")
+    else:
+        return (
+            f"https://github.com/E3SM-Project/mosaic/blob/"
+            f"{mosaic.__version__}/mosaic/{fn}{linespec}"
+        )
