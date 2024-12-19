@@ -68,4 +68,4 @@ warn_redundant_casts = true
 warn_unused_configs = true
 
 [tool.setuptools.dynamic]
-version = { attr = "mosaic.version.__version__" }
+version = { attr = "mosaic.__version__" }
