@@ -1,9 +1,10 @@
+from __future__ import annotations
+
 import numpy as np
 from cartopy.mpl.geoaxes import GeoAxes
 from matplotlib.axes import Axes
 from matplotlib.collections import PolyCollection
 from matplotlib.colors import Normalize
-from numpy.typing import ArrayLike
 from xarray.core.dataarray import DataArray
 
 from mosaic.descriptor import Descriptor
@@ -18,8 +19,7 @@ def polypcolor(
     cmap: str | Normalize | None = None,
     vmin: float | None = None,
     vmax: float | None = None,
-    facecolors: ArrayLike | None = None,
-    **kwargs
+    **kwargs,
 ) -> PolyCollection:
     """
     Create a pseudocolor plot of a unstructured MPAS grid.
@@ -64,8 +64,9 @@ def polypcolor(
 
     transform = descriptor.transform
 
-    collection = PolyCollection(verts, alpha=alpha, array=c,
-                                cmap=cmap, norm=norm, **kwargs)
+    collection = PolyCollection(
+        verts, alpha=alpha, array=c, cmap=cmap, norm=norm, **kwargs
+    )
 
     # only set the transform if GeoAxes
     if isinstance(ax, GeoAxes):
@@ -79,7 +80,7 @@ def polypcolor(
     ax.update_datalim(limits)
     ax.autoscale_view()
 
-    # for planar periodic plot explicity set the axis limit
+    # for planar periodic plot explicitly set the axis limit
     if not descriptor.is_spherical and descriptor.x_period:
         xmin, xmax = _find_planar_periodic_axis_limits(descriptor, "x")
         ax.set_xlim(xmin, xmax)
@@ -92,8 +93,7 @@ def polypcolor(
 
 
 def _find_planar_periodic_axis_limits(descriptor, coord):
-    """Find the correct (tight) axis limits for planar periodic meshes.
-    """
+    """Find the correct (tight) axis limits for planar periodic meshes."""
 
     edge_min = float(descriptor.ds[f"{coord}Edge"].min())
     vertex_min = float(descriptor.ds[f"{coord}Vertex"].min())

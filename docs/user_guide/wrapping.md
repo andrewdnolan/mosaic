@@ -1,8 +1,6 @@
----
-file_format: mystnb
-kernelspec:
-  name: python3
----
+______________________________________________________________________
+
+## file_format: mystnb kernelspec: name: python3
 
 # Periodic Mesh Support
 
@@ -22,7 +20,7 @@ remove the periodicity, which enables plotting. Future work will mirror the
 patches across the periodic boundary, so as to more accurately demonstrate the
 periodic nature of the mesh.
 
-<!-- 
+<!--
 ## Planar Periodic Meshes
 
 ```{code-cell} ipython3
@@ -36,7 +34,7 @@ import matplotlib.pyplot as plt
 # download and read the mesh from lcrc
 ds = mosaic.datasets.open_dataset("doubly_periodic_4x4")
 
-# create the figure and a GeoAxis 
+# create the figure and a GeoAxis
 fig, ax = plt.subplots(constrained_layout=True,)
 
 descriptor = mosaic.Descriptor(ds)
@@ -55,6 +53,7 @@ ax.set_aspect('equal')
 ## Supported Map Projections for Spherical Meshes
 
 Currently, the only support map projection are:
+
 - <inv:#*.PlateCarree>
 - <inv:#*.LambertCylindrical>
 - <inv:#*.Mercator>
