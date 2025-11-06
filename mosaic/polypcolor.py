@@ -6,7 +6,7 @@ from matplotlib.collections import PolyCollection
 from xarray.core.dataarray import DataArray
 
 from mosaic.descriptor import Descriptor
-from mosaic.mpas_collection import MPASCollection
+from mosaic.mpas_collection import MPASCollection, PolyMeshCollection
 
 
 def _mirror_polycollection(ax, collection, descriptor, array, **kwargs):
