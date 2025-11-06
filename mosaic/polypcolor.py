@@ -7,7 +7,7 @@ from matplotlib.collections import PolyCollection
 from xarray.core.dataarray import DataArray
 
 from mosaic.descriptor import Descriptor
-from mosaic.mpas_collection import MPASCollection
+from mosaic.mpas_collection import MPASCollection, PolyMeshCollection
 
 
 def _get_array_location(array):
@@ -120,11 +120,11 @@ def polypcolor(
     vmax = kwargs.pop("vmax", None)
     norm = kwargs.pop("norm", None)
 
-    collection = PolyCollection(verts, array=array, **kwargs)
+    collection = PolyMeshCollection(verts, array=array, **kwargs)
 
-    # only set the transform if GeoAxes
-    if isinstance(ax, GeoAxes):
-        collection.set_transform(descriptor.transform)
+    # # only set the transform if GeoAxes
+    # if isinstance(ax, GeoAxes):
+    #     collection.set_transform(descriptor.transform)
 
     collection._scale_norm(norm, vmin, vmax)
     ax.add_collection(collection)
