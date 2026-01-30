@@ -34,12 +34,15 @@ docs = [
     # building documentation
     "sphinx",
     "myst-nb",
+    "nbqa",
     "sphinx-book-theme",
     "sphinx-copybutton",
     "sphinx-remove-toctrees",
 ]
 
 dev = [
+    # development tools
+    "jupyterlab",
     # linting and testing
     "pip",
     "pytest",
