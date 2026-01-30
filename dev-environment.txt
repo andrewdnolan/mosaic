@@ -4,6 +4,7 @@ cmocean
 h5netcdf
 netcdf4
 matplotlib-base
+networkx
 numpy
 pooch
 pyproj
@@ -14,6 +15,8 @@ xarray
 
 # Development
 jupyterlab
+hyperfine
+mpas_tools
 
 # Building
 setuptools >=60
