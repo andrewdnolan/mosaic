@@ -12,6 +12,9 @@ shapely
 tqdm
 xarray
 
+# Development
+jupyterlab
+
 # Building
 setuptools >=60
 
@@ -25,8 +28,9 @@ mypy
 pre-commit
 
 # Documentation
-sphinx
 myst-nb
+nbqa
+sphinx
 sphinx-book-theme
 sphinx-copybutton
 sphinx-remove-toctrees
