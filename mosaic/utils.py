@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 import xarray as xr
 from cartopy.crs import CRS
-from shapely import LineString, Polygon, is_valid, prepare
+from shapely import LineString, is_valid
 
 __all__ = ["cull_mesh", "get_invalid_patches"]
 
@@ -161,20 +161,22 @@ def get_radius(projection: CRS) -> float:
     return max(x_range, y_range)
 
 
-def get_domains(
-    projection: CRS, scale: float = 0.015
-) -> tuple[Polygon, Polygon]:
-    """ """
-    buffer = get_radius(projection) * scale
+def compute_cell_centroid(cell_patches, verticesOnCell):
+    """
+    shoelace formula for centroid with ragged masking
+    """
+    mask = verticesOnCell != -1
 
-    ext_domain = projection.domain
-    int_domain = projection.domain.buffer(-buffer)
+    x0, y0 = np.unstack(cell_patches, axis=-1)
+    x1, y1 = np.unstack(np.roll(cell_patches, -1, axis=1), axis=-1)
 
-    # prepare returns None, so do not assign
-    prepare(ext_domain)
-    prepare(int_domain)
+    # need to mask out ragged indices b/c centroid is a weighted sum
+    cross = ((x0 * y1) - (x1 * y0)) * mask
 
-    return ext_domain, int_domain
+    cx = ((x0 + x1) * cross).sum(axis=-1) / (3.0 * cross.sum(axis=-1))
+    cy = ((y0 + y1) * cross).sum(axis=-1) / (3.0 * cross.sum(axis=-1))
+
+    return cx, cy
 
 
 def get_invalid_patches(patches: np.ndarray) -> None | np.ndarray:
@@ -193,6 +195,8 @@ def get_invalid_patches(patches: np.ndarray) -> None | np.ndarray:
     :py:class:`~numpy.ndarray` or None
         Indices of invalid patches. If no patches are invalid then returns None
     """
+
+    # TODO: switch to Polygon, which less permissive than LineString
     # convert the patches to a list of shapely geometries
     geoms = [LineString(patch) for patch in patches]
     # check if the shapely geometries are valid

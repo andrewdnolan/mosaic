@@ -730,42 +730,57 @@ def _compute_vertex_patches(ds: Dataset) -> ndarray:
 
 def _compute_cull_mask(ds: xr.Dataset, projection: CRS) -> ndarray[bool]:
     """ """
-    # .....
+
+    # get and prepare projection domain. prepare returns None, so do not assign
+    ext_domain = projection.domain
+    shapely.prepare(ext_domain)
+
+    cell_patches = _compute_cell_patches(ds)
+
+    # start with no cells to be culled
     cull_mask = np.zeros(ds.sizes["nCells"], dtype=bool)
 
-    # ....
-    x = ds.xCell.values
-    y = ds.yCell.values
-    cell_patches = _compute_cell_patches(ds)
+    xVertex = ds.xVertex.values
+    yVertex = ds.yVertex.values
+
+    # connectivity arrays have already been zero indexed
+    verticesOnCell = ds.verticesOnCell
+
+    # mask of vertices within the projection boundary
+    vertex_contained = shapely.contains_xy(ext_domain, xVertex, yVertex)
+
+    # translate vertex mask to cell mask where at least one vertex is contained
+    cell_mask = np.any(
+        np.where(
+            verticesOnCell != -1, vertex_contained[verticesOnCell], False
+        ),
+        axis=1,
+    )
 
     # mask of cells with any nan vertices
     nan_mask = np.any(np.isnan(cell_patches), axis=(1, 2))
 
-    cull_mask = nan_mask
+    # only check centroids of cells not being culled
+    x_cell = ds.xCell.values[cell_mask & ~nan_mask]
+    y_cell = ds.yCell.values[cell_mask & ~nan_mask]
 
-    # start by scaling down the projection boundary by
-    ext_domain, int_domain = mosaic.utils.get_domains(projection)
-
-    # only turn cells within boundary, that are not nans, into shapely polygons
-    boundary_band = ~nan_mask & ~shapely.contains_xy(int_domain, x, y)
-
-    polys = [shapely.Polygon(p) for p in cell_patches[boundary_band]]
-    # TODO: should we prepare polygons?
-
-    x = x[boundary_band]
-    y = y[boundary_band]
-
-    # True: polygons that DO NOT contain projected cell center
-    centriod_mask = ~np.array(
-        [shapely.contains_xy(p, x[i], y[i]) for i, p in enumerate(polys)]
+    # calculate patch centroid, to be compared to projected cell center
+    # TODO: filter our self intersecting polygons
+    x_cent, y_cent = mosaic.utils.compute_cell_centroid(
+        cell_patches[cell_mask & ~nan_mask],
+        verticesOnCell[cell_mask & ~nan_mask],
     )
 
-    # True: polygons that are valid
-    valid_mask = ~shapely.is_valid(polys)
-    # True: ...
-    cover_mask = ~ext_domain.covers(polys)
+    # TODO: can we use projection.threshold instead?
+    thresh = mosaic.utils.get_radius(projection) * 1.5e-2
 
-    cull_mask[boundary_band] |= centriod_mask | valid_mask | cover_mask
+    # mask where cell centroids and projected cell center are too far apart
+    centroid_mask = np.hypot(x_cell - x_cent, y_cell - y_cent) > thresh
+
+    # cull cells that are nan OR with no vertices within projection domain
+    cull_mask |= nan_mask | ~cell_mask
+    # centroid mask was only calculated for cells not being culled
+    cull_mask[cell_mask & ~nan_mask] |= centroid_mask
 
     # TODO: add option to return component mask for debugging
     return cull_mask
