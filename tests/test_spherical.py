@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import inspect
+
 import cartopy.crs as ccrs
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -10,24 +12,19 @@ import mosaic.utils
 
 mpl.use("Agg", force=True)
 
-SUPPORTED_PROJECTIONS = [
-    ccrs.PlateCarree(),
-    ccrs.LambertCylindrical(),
-    ccrs.Mercator(),
-    ccrs.Miller(),
-    ccrs.Robinson(),
-    ccrs.Stereographic(),
-    ccrs.RotatedPole(),
-    ccrs.InterruptedGoodeHomolosine(),
-    ccrs.EckertI(),
-    ccrs.EckertII(),
-    ccrs.EckertIII(),
-    ccrs.EckertIV(),
-    ccrs.EckertV(),
-    ccrs.EckertVI(),
-    ccrs.EqualEarth(),
-    ccrs.NorthPolarStereo(),
-    ccrs.SouthPolarStereo(),
+# get the names, as strings, of unsupported projections for spherical meshes
+unsupported = [
+    p.__name__ for p in mosaic.descriptor.UNSUPPORTED_SPHERICAL_PROJECTIONS
+]
+
+PROJECTIONS = [
+    obj()
+    for name, obj in inspect.getmembers(ccrs)
+    if inspect.isclass(obj)
+    and issubclass(obj, ccrs.Projection)
+    and not name.startswith("_")  # skip internal classes
+    and obj is not ccrs.Projection  # skip base Projection class
+    and name not in unsupported  # skip unsupported projections
 ]
 
 
@@ -38,7 +35,7 @@ def id_func(projection):
 class TestSphericalWrapping:
     ds = mosaic.datasets.open_dataset("QU.240km")
 
-    @pytest.fixture(scope="module", params=SUPPORTED_PROJECTIONS, ids=id_func)
+    @pytest.fixture(scope="module", params=PROJECTIONS, ids=id_func)
     def setup_descriptor(self, request):
         return mosaic.Descriptor(self.ds, request.param, ccrs.Geodetic())
 

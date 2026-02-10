@@ -31,9 +31,9 @@ connectivity_arrays = [
 ]
 
 UNSUPPORTED_SPHERICAL_PROJECTIONS = (
+    # EuroPP actually works is a subclass of the generic UTM projection, which
+    # does not work, so EuroPP raises an error.
     ccrs.EuroPP,
-    ccrs.OSGB,
-    ccrs.OSNI,
     ccrs.UTM,
 )
 
