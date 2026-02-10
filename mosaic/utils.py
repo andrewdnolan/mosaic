@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import numpy as np
+import shapely
 import xarray as xr
 from cartopy.crs import CRS
-from shapely import LineString, is_valid
 
 __all__ = ["cull_mesh", "get_invalid_patches"]
 
@@ -103,10 +103,18 @@ def cull_mesh(
 
     # TODO: add check to make sure `da_base` has been zero-indexed
 
-    # invert all the masks, so that cells to cull are dropped
+    # invert mask so that cells to cull are dropped
     cell_mask = ~cells_to_cull
-    edge_mask = ~np.all(~cell_mask[ds_base.cellsOnEdge], axis=1)
-    vert_mask = ~np.all(~edge_mask[ds_base.edgesOnVertex], axis=1)
+
+    # pad masks with a False, using `np.r_`, to avoid issues with a
+    # connectivity value of `-1`, which means no neighbor NOT the last index
+    cell_mask_p = np.r_[False, cell_mask]
+    # keep edge is any adjacent cell is kept
+    edge_mask = np.any(cell_mask_p[ds_base.cellsOnEdge + 1], axis=1)
+
+    edge_mask_p = np.r_[False, edge_mask]
+    # keep vertex is any adjacent vertex is kept
+    vert_mask = np.any(edge_mask_p[ds_base.edgesOnVertex + 1], axis=1)
 
     # indices of kept location from the original mesh
     index_to_cell_id = np.flatnonzero(cell_mask)
@@ -198,9 +206,9 @@ def get_invalid_patches(patches: np.ndarray) -> None | np.ndarray:
 
     # TODO: switch to Polygon, which less permissive than LineString
     # convert the patches to a list of shapely geometries
-    geoms = [LineString(patch) for patch in patches]
+    geoms = [shapely.LineString(patch) for patch in patches]
     # check if the shapely geometries are valid
-    valid = is_valid(geoms)
+    valid = shapely.is_valid(geoms)
 
     if np.all(valid):
         # no invalid patches, so return None
