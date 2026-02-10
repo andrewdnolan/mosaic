@@ -1,12 +1,9 @@
 from __future__ import annotations
 
-from typing import Literal
-
 import numpy as np
 import xarray as xr
-from shapely import LineString, is_valid
-
-from mosaic.descriptor import Descriptor
+from cartopy.crs import CRS
+from shapely import LineString, Polygon, is_valid, prepare
 
 __all__ = ["cull_mesh", "get_invalid_patches"]
 
@@ -156,9 +153,31 @@ def cull_mesh(
     return ds_culled
 
 
-def get_invalid_patches(
-    descriptor: Descriptor, location: Literal["cell", "edge", "vertex"]
-) -> None | np.ndarray:
+def get_radius(projection: CRS) -> float:
+    """ """
+    x_range = projection.x_limits[1] - projection.x_limits[0]
+    y_range = projection.y_limits[1] - projection.y_limits[0]
+
+    return max(x_range, y_range)
+
+
+def get_domains(
+    projection: CRS, scale: float = 0.015
+) -> tuple[Polygon, Polygon]:
+    """ """
+    buffer = get_radius(projection) * scale
+
+    ext_domain = projection.domain
+    int_domain = projection.domain.buffer(-buffer)
+
+    # prepare returns None, so do not assign
+    prepare(ext_domain)
+    prepare(int_domain)
+
+    return ext_domain, int_domain
+
+
+def get_invalid_patches(patches: np.ndarray) -> None | np.ndarray:
     """Helper function to identify problematic patches.
 
     Returns the indices of the problematic patches as determined by
@@ -166,28 +185,21 @@ def get_invalid_patches(
 
     Parameters
     ----------
-    descriptor : :py:class:`Descriptor`
-        The ``Descriptor`` object you want to check the patches of
-    location : string
-        The patch location to check: "cell" or "edge" or "vertex"
+    patches : :py:class:`~numpy.ndarray`
+        The patch array to check
 
     Returns
     -------
     :py:class:`~numpy.ndarray` or None
         Indices of invalid patches. If no patches are invalid then returns None
     """
-    # extract the patches
-    patches = descriptor.__getattribute__(f"{location}_patches")
-    # get the pole mask b/c we know patches will be invalid there
-    pole_mask = descriptor.__getattribute__(f"_{location}_pole_mask")
     # convert the patches to a list of shapely geometries
-    geoms = [LineString(patch) for patch in patches[~pole_mask]]
+    geoms = [LineString(patch) for patch in patches]
     # check if the shapely geometries are valid
     valid = is_valid(geoms)
 
     if np.all(valid):
         # no invalid patches, so return None
         return None
-    # return the indices of the invalid patches
-    index_array = np.arange(patches.shape[0])
-    return index_array[~pole_mask][~valid]
+
+    return np.flatnonzero(~valid)

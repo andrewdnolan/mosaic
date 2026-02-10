@@ -13,6 +13,8 @@ from mosaic.mpas_collection import MPASCollection
 def _get_array_location(array):
     """Helper function to find mesh location where dataarray is defined"""
 
+    # TODO: add support for duck typing by using shape attr
+    # TODO: handle arrays from unculled dataset
     if "nCells" in array.dims:
         return "cell"
     if "nEdges" in array.dims:
@@ -26,13 +28,10 @@ def _get_array_location(array):
 def _parse_args(descriptor, array):
     """Helper function to get patch array corresponding to dataarray"""
 
+    # TODO: add lookup table indexing
     loc = _get_array_location(array)
 
     verts = getattr(descriptor, f"{loc}_patches")
-    pole_mask = getattr(descriptor, f"_{loc}_pole_mask", None)
-
-    if descriptor.projection and pole_mask is not None:
-        array = array.where(~pole_mask, np.nan)
 
     return verts, array
 

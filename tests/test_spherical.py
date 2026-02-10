@@ -3,11 +3,10 @@ from __future__ import annotations
 import cartopy.crs as ccrs
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-import numpy as np
 import pytest
-from shapely import LinearRing, is_valid
 
 import mosaic
+import mosaic.utils
 
 mpl.use("Agg", force=True)
 
@@ -75,11 +74,9 @@ class TestSphericalWrapping:
 
         # extract the patches
         patches = descriptor.__getattribute__(f"{patch.lower()}_patches")
-        # get the pole mask b/c we know patches will be invalid there
-        pole_mask = descriptor.__getattribute__(f"_{patch.lower()}_pole_mask")
 
-        # convert the patches to a list of shapely geometries
-        geoms = [LinearRing(patch) for patch in patches[~pole_mask]]
+        # get list of invalid patches
+        invalid = mosaic.utils.get_invalid_patches(patches)
 
         # assert that all the patches are valid
-        assert np.all(is_valid(geoms))
+        assert invalid is None
