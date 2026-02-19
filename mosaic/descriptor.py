@@ -276,9 +276,9 @@ class Descriptor:
         """Parse period attribute, return None for non-periodic meshes"""
 
         attr = f"{dim}_period"
-        try:
+        if attr in ds.attrs and ds.attrs[attr] is not None:
             period = float(ds.attrs[attr])
-        except KeyError:
+        else:
             period = None
 
         # in the off chance mesh is periodic but does not have period attribute
@@ -330,14 +330,15 @@ class Descriptor:
 
         def get_axis_min(self, coord: Literal["x", "y"]) -> float:
             """ """
+            period = self.__getattribute__(f"{coord}_period")
             edge_min = float(self.ds[f"{coord}Edge"].min())
             vertex_min = float(self.ds[f"{coord}Vertex"].min())
 
             # an edge connects two vertices, so a vertices most extreme
             # position should always be more extended than an edge's
-            if vertex_min > edge_min:
+            if (period is not None) and (vertex_min > edge_min):
                 max = float(self.ds[f"{coord}Vertex"].max())
-                min = max - self.__getattribute__(f"{coord}_period")
+                min = max - period
             else:
                 min = float(self.ds[f"{coord}Vertex"].min())
 
