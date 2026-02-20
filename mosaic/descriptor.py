@@ -140,6 +140,9 @@ class Descriptor:
         # calls attribute setter method
         self.latlon = use_latlon
 
+        # store original mesh dimension sizes
+        self.sizes = mesh_ds
+
         #: :py:class:`~xarray.Dataset` that contains the minimal subset of
         #: coordinate and connectivity arrays from the parent mesh needed to
         #: create patches arrays.
@@ -255,6 +258,21 @@ class Descriptor:
         # ...
         cull_mask = _compute_cull_mask(self.ds, self.projection)
         self.ds = mosaic.utils.cull_mesh(self.ds.copy(deep=True), cull_mask)
+
+    @property
+    def sizes(self) -> dict[str, int]:
+        """
+        :py:class:`dict` of dimension (``nCells``, ``nEdges``, and
+        ``nVertices``) sizes
+        """
+        return self._sizes
+
+    @sizes.setter
+    def sizes(self, ds) -> None:
+        """ """
+        self._sizes = {
+            dim: ds.sizes[dim] for dim in ["nCells", "nEdges", "nVertices"]
+        }
 
     @property
     def latlon(self) -> bool:
