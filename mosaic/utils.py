@@ -4,6 +4,7 @@ import numpy as np
 import shapely
 import xarray as xr
 from cartopy.crs import CRS
+from numpy.typing import ArrayLike
 
 __all__ = ["cull_mesh", "get_invalid_patches"]
 
@@ -169,20 +170,47 @@ def get_radius(projection: CRS) -> float:
     return max(x_range, y_range)
 
 
-def compute_cell_centroid(cell_patches, verticesOnCell):
+def compute_cell_centroid(
+    cell_patches: np.ndarray, verticesOnCell: ArrayLike
+) -> tuple[np.ndarray, np.ndarray]:
     """
-    shoelace formula for centroid with ragged masking
+    Compute Centroid of cell patch using shoelace formula
+
+    https://en.wikipedia.org/wiki/Centroid#Of_a_polygon
+
+    Parameters
+    ----------
+    cell_patches: np.ndarray
+        cell patches to calculate the centroids of (nCells, maxEdges, 2)
+    verticesOnCell: ArrayLike
+        mesh connectivity array with ragged cells denoted by ``-1``
+
+    Returns
+    -------
+    cx, cy: (np.ndarray, np.ndarray)
+        Patch centroids where each array is of length nCells
     """
     mask = verticesOnCell != -1
 
-    x0, y0 = np.unstack(cell_patches, axis=-1)
-    x1, y1 = np.unstack(np.roll(cell_patches, -1, axis=1), axis=-1)
+    r, c = np.nonzero(~mask)
+    bad = np.any(cell_patches[r, c, :] != cell_patches[r, 0, :], axis=1)
+    if np.any(bad):
+        msg = (
+            f"Padded vertex does not equal first vertex. Check nCells ="
+            f" {np.unique(r[bad])}"
+        )
+        raise ValueError(msg)
+
+    x0 = cell_patches[..., 0]
+    y0 = cell_patches[..., 1]
+    x1 = np.roll(x0, -1, axis=1)
+    y1 = np.roll(y0, -1, axis=1)
 
     # need to mask out ragged indices b/c centroid is a weighted sum
     cross = ((x0 * y1) - (x1 * y0)) * mask
 
-    cx = ((x0 + x1) * cross).sum(axis=-1) / (3.0 * cross.sum(axis=-1))
-    cy = ((y0 + y1) * cross).sum(axis=-1) / (3.0 * cross.sum(axis=-1))
+    cx = ((x0 + x1) * cross).sum(axis=1) / (3.0 * cross.sum(axis=1))
+    cy = ((y0 + y1) * cross).sum(axis=1) / (3.0 * cross.sum(axis=1))
 
     return cx, cy
 
