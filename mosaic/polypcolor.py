@@ -23,8 +23,11 @@ def _get_array_location(
     }
 
     if array.ndim != 1:
-        msg = f"Array should be one dimensional, instead as {array.ndim} dims"
-        raise ValueError(msg)
+        msg = f"Array should be one dimensional, instead has {array.ndim} dims"
+        if sum([size > 1 for size in array.shape]) > 1:
+            # more than one dimensions is greater than length one
+            raise ValueError(msg)
+        array = array.squeeze()
 
     # dict of dim lengths of the original dataset
     origin_rev = {v: k for k, v in descriptor.sizes.items()}
