@@ -13,7 +13,9 @@ tqdm
 xarray
 
 # Development
+click
 jupyterlab
+mpas_tools
 
 # Building
 setuptools >=60
