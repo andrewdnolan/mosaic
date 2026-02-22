@@ -172,15 +172,21 @@ def render_logo() -> None:
 
     min_area = 2.0 * (dmin / 2.0) ** 2.0 * np.sqrt(3.0)
     threshold = factor * min_area
-    text_mask = xr.where(ds.areaCell < threshold, True, np.nan)
 
-    cmap = config.get("render", "cmap")
-    dpi = config.getfloat("render", "dpi")
+    cmap = plt.get_cmap(config.get("render", "cmap"))
+    cmap.set_under("k")
 
     fig, ax = plt.subplots()
 
-    mosaic.polypcolor(ax, descriptor, ds.areaCell, cmap=cmap, aa=True)
-    mosaic.polypcolor(ax, descriptor, text_mask, cmap="binary_r", aa=False)
+    kwargs = {
+        "cmap": cmap,
+        "vmin": threshold,
+        "antialiased": True,
+        "edgecolor": "k",
+        "linewidth": 0.1,
+    }
+
+    mosaic.polypcolor(ax, descriptor, ds.areaCell, **kwargs)
 
     ax.set_xlim(ds.xVertex.min(), ds.xVertex.max())
     ax.set_ylim(ds.yVertex.min(), ds.yVertex.max())
@@ -188,6 +194,8 @@ def render_logo() -> None:
     ax.set_axis_off()
     ax.set_aspect("equal")
 
+    dpi = config.getfloat("render", "dpi")
+    fig.savefig("mosaic_logo.pdf", bbox_inches="tight")
     fig.savefig("mosaic_logo.png", bbox_inches="tight", dpi=dpi)
 
 
