@@ -263,7 +263,7 @@ class MPASContourGenerator:
 
         lower_level, upper_level = self.check_levels(lower_level, upper_level)
 
-        mask = (self._z > lower_level) & (self._z < upper_level)
+        mask = (self._z > lower_level) & (self._z <= upper_level)
 
         graph = self._create_contour_graph(mask, filled=True)
         polys = self._split_and_order_graph(graph)
