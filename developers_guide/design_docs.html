@@ -2,13 +2,13 @@
 <!DOCTYPE html>
 
 
-<html lang="en" data-content_root="../../" >
+<html lang="en" data-content_root="../" >
 
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>mosaic.polypcolor &#8212; mosaic 1.2.1 documentation</title>
+    <title>Design Documents &#8212; mosaic 1.2.1 documentation</title>
   
   
   
@@ -27,32 +27,32 @@
   </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
 
-    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=8f2a1f02" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
-    <link rel="stylesheet" type="text/css" href="../../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
-    <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-    <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=37a2a518" />
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=3c74b3bc" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=37a2a518" />
   
   <!-- So that users can add custom icons -->
-  <script src="../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../_static/documentation_options.js?v=60f8217a"></script>
-    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
-    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
-    <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
-    <script src="../../_static/copybutton.js?v=4ea706d9"></script>
-    <script src="../../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'developers_guide/generated/mosaic.polypcolor';</script>
-    <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="mosaic.contour" href="mosaic.contour.html" />
-    <link rel="prev" title="API Reference" href="../api.html" />
+    <script src="../_static/documentation_options.js?v=60f8217a"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=4ea706d9"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=fab101a9"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'developers_guide/design_docs';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Contouring" href="design_docs/contouring.html" />
+    <link rel="prev" title="mosaic.datasets.open_dataset" href="generated/mosaic.datasets.open_dataset.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -74,7 +74,7 @@
   <dialog id="pst-search-dialog">
     
 <form class="bd-search d-flex align-items-center"
-      action="../../search.html"
+      action="../search.html"
       method="get">
   <i class="fa-solid fa-magnifying-glass"></i>
   <input type="search"
@@ -123,7 +123,7 @@
     
   
 
-<a class="navbar-brand logo" href="../../index.html">
+<a class="navbar-brand logo" href="../index.html">
   
   
   
@@ -134,8 +134,8 @@
       
     
     
-    <img src="../../_static/mosaic_logo.png" class="logo__image only-light" alt="mosaic 1.2.1 documentation - Home"/>
-    <img src="../../_static/mosaic_logo.png" class="logo__image only-dark pst-js-only" alt="mosaic 1.2.1 documentation - Home"/>
+    <img src="../_static/mosaic_logo.png" class="logo__image only-light" alt="mosaic 1.2.1 documentation - Home"/>
+    <img src="../_static/mosaic_logo.png" class="logo__image only-dark pst-js-only" alt="mosaic 1.2.1 documentation - Home"/>
   
   
 </a></div>
@@ -150,17 +150,17 @@
     <div class="bd-toc-item navbar-nav active">
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
 <ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../../user_guide/quick_start.html">Quick Start for Users</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user_guide/spherical_mesh_support.html">Spherical Mesh Support</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user_guide/periodic_mesh_support.html">Planar Periodic Meshes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user_guide/contouring.html">Contouring on the MPAS Mesh</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/quick_start.html">Quick Start for Users</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/spherical_mesh_support.html">Spherical Mesh Support</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/periodic_mesh_support.html">Planar Periodic Meshes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user_guide/contouring.html">Contouring on the MPAS Mesh</a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Developers Guide:</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="../quick_start.html">Quick Start for Developers</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="../design_docs.html">Design Documents</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
-<li class="toctree-l2"><a class="reference internal" href="../design_docs/contouring.html">Contouring</a></li>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="quick_start.html">Quick Start for Developers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+<li class="toctree-l1 current active has-children"><a class="current reference internal" href="#">Design Documents</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l2"><a class="reference internal" href="design_docs/contouring.html">Contouring</a></li>
 </ul>
 </details></li>
 </ul>
@@ -241,7 +241,7 @@
       
       
       
-      <li><a href="../../_sources/developers_guide/generated/mosaic.polypcolor.rst" target="_blank"
+      <li><a href="../_sources/developers_guide/design_docs.md" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -251,7 +251,7 @@
 <span class="btn__icon-container">
   <i class="fas fa-file"></i>
   </span>
-<span class="btn__text-container">.rst</span>
+<span class="btn__text-container">.md</span>
 </a>
 </li>
       
@@ -304,9 +304,7 @@
 <button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
 </button>
-<button class="sidebar-toggle secondary-toggle btn btn-sm pst-navbar-icon" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
-    <span class="fa-solid fa-list"></span>
-</button>
+
 </div></div>
       
     </div>
@@ -317,19 +315,11 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>mosaic.polypcolor</h1>
+    <h1>Design Documents</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
             
-            <div>
-                <h2> Contents </h2>
-            </div>
-            <nav aria-label="Page">
-                <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mosaic.polypcolor"><code class="docutils literal notranslate"><span class="pre">polypcolor()</span></code></a></li>
-</ul>
-            </nav>
         </div>
     </div>
 </div>
@@ -339,30 +329,18 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="mosaic-polypcolor">
-<h1>mosaic.polypcolor<a class="headerlink" href="#mosaic-polypcolor" title="Link to this heading">#</a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="mosaic.polypcolor">
-<span class="sig-prename descclassname"><span class="pre">mosaic.</span></span><span class="sig-name descname"><span class="pre">polypcolor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">descriptor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#mosaic.polypcolor" title="Link to this definition">#</a></dt>
-<dd><p>Create a pseudocolor plot of a unstructured MPAS grid.</p>
-<p>The unstructured grid is specified by passing a
-<a class="reference internal" href="mosaic.Descriptor.html#mosaic.Descriptor" title="mosaic.Descriptor"><code class="xref py py-class docutils literal notranslate"><span class="pre">Descriptor</span></code></a> object as the second parameter.
-See <a class="reference internal" href="mosaic.Descriptor.html#mosaic.Descriptor" title="mosaic.Descriptor"><code class="xref py py-class docutils literal notranslate"><span class="pre">mosaic.Descriptor</span></code></a> for an explanation of what the
-<code class="docutils literal notranslate"><span class="pre">Descriptor</span></code> is and how to construct it.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">matplotlib</span> <span class="pre">axes</span> <span class="pre">object</span></code></a>) – Axes, or GeoAxes, on which to plot</p></li>
-<li><p><strong>descriptor</strong> (<a class="reference internal" href="mosaic.Descriptor.html#mosaic.Descriptor" title="mosaic.Descriptor"><code class="xref py py-class docutils literal notranslate"><span class="pre">Descriptor</span></code></a>) – An already created <code class="docutils literal notranslate"><span class="pre">Descriptor</span></code> object</p></li>
-<li><p><strong>array</strong> (<a class="reference external" href="https://docs.xarray.dev/en/stable/generated/xarray.DataArray.html#xarray.DataArray" title="(in xarray v2026.2.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">DataArray</span></code></a>) – The color values to plot. Must have a dimension named either
-<code class="docutils literal notranslate"><span class="pre">nCells</span></code>, <code class="docutils literal notranslate"><span class="pre">nEdges</span></code>, or <code class="docutils literal notranslate"><span class="pre">nVertices</span></code>.</p></li>
-<li><p><strong>other_parameters</strong> – All other parameters are the forwarded to the
-<a class="reference external" href="https://matplotlib.org/stable/api/collections_api.html#matplotlib.collections.PolyCollection" title="(in Matplotlib v3.10.8)"><code class="xref py py-class docutils literal notranslate"><span class="pre">PolyCollection</span></code></a> creation.</p></li>
+  <section class="tex2jax_ignore mathjax_ignore" id="design-documents">
+<h1>Design Documents<a class="headerlink" href="#design-documents" title="Link to this heading">#</a></h1>
+<p>The pages contained within are intended to serve as somewhere between true “design documents”
+and a collection of notes taken <em>during</em> development. The hybrid nature of these notes is
+intended to document the decisions made during development and the test problems used to inform
+those decisions.</p>
+<div class="toctree-wrapper compound">
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Design Documents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="design_docs/contouring.html">Contouring</a></li>
 </ul>
-</dd>
-</dl>
-</dd></dl>
-
+</div>
 </section>
 
 
@@ -377,20 +355,20 @@ See <a class="reference internal" href="mosaic.Descriptor.html#mosaic.Descriptor
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="../api.html"
+       href="generated/mosaic.datasets.open_dataset.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">API Reference</p>
+        <p class="prev-next-title">mosaic.datasets.open_dataset</p>
       </div>
     </a>
     <a class="right-next"
-       href="mosaic.contour.html"
+       href="design_docs/contouring.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">mosaic.contour</p>
+        <p class="prev-next-title">Contouring</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -400,23 +378,6 @@ See <a class="reference internal" href="mosaic.Descriptor.html#mosaic.Descriptor
             </div>
             
             
-              
-                <dialog id="pst-secondary-sidebar-modal"></dialog>
-                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
-
-
-  <div class="sidebar-secondary-item"><div
-    id="pst-page-navigation-heading-2"
-    class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> Contents
-  </div>
-  <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#mosaic.polypcolor"><code class="docutils literal notranslate"><span class="pre">polypcolor()</span></code></a></li>
-</ul>
-  </nav></div>
-
-</div></div>
               
             
           </div>
@@ -461,8 +422,8 @@ By E3SM Development Team
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
 
   <footer class="bd-footer">
   </footer>
