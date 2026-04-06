@@ -18,17 +18,18 @@ def download_meshes(app, env, docnames):  # noqa: ARG001
         mosaic.datasets.open_dataset(mesh)
 
 
-def download_coastlines(app, env, docnames):  # noqa: ARG001
-    """Function to download coastlines prior to executing documentation, so
-    warnings don't appear in the rendered docs
+def download_natural_earth_features(app, env, docnames):  # noqa: ARG001
+    """Function to download coastlines and land boundaries prior to executing
+    documentation, so warnings don't appear in the rendered docs
     """
     for scale in ("110m", "50m"):
+        natural_earth(resolution=scale, category="physical", name="land")
         natural_earth(resolution=scale, category="physical", name="coastline")
 
 
 def setup(app):
     app.connect("env-before-read-docs", download_meshes)
-    app.connect("env-before-read-docs", download_coastlines)
+    app.connect("env-before-read-docs", download_natural_earth_features)
 
 
 # -- Project information -----------------------------------------------------
