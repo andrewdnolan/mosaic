@@ -48,20 +48,19 @@ fig, ax = plt.subplots(
     subplot_kw={"projection": projection},
 )
 
-cmap = cmocean.tools.crop(cmocean.cm.topo, -5e3, 0, 0.0)
-
 # create a `Descriptor` object which takes the mesh information and creates
 # the polygon coordinate arrays needed for `matplotlib.collections.PolyCollection`.
 descriptor = mosaic.Descriptor(ds, projection, transform)
 
 # using the `Descriptor` object we just created, make a pseudocolor plot of
-# the "indexToCellID" variable, which is defined at cell centers.
+# the "bottomDepth" variable, which is defined at cell centers.
 collection = mosaic.polypcolor(
-    ax, descriptor, -ds.bottomDepth, antialiaseds=True, cmap=cmap
+    ax, descriptor, ds.bottomDepth, antialiaseds=True, cmap=cmocean.cm.deep
 )
 
-ax.coastlines(lw=0.5)
-ax.add_feature(cfeature.LAND, fc="grey", zorder=-1, alpha=0.8)
+# plot the coastlines as resolved by the MPAS mesh
+mosaic.coastlines(ax, descriptor)
+
 fig.colorbar(
     collection,
     fraction=0.1,

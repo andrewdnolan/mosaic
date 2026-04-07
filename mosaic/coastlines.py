@@ -15,17 +15,17 @@ def coastlines(
     ax: GeoAxes, descriptor: Descriptor, color: str = "black", **kwargs
 ) -> None:
     """
-    Add coastal **outlines** to the current axes using the
-    coastline information from the MPAS dataset.
+    Plot coastal **outlines** using the connectivity info from the MPAS mesh
 
     Parameters
     ----------
-    ax : Axes
-        The axes to add the coastlines to.
+    ax : cartopy.mpl.geoaxes.GeoAxes
+        The cartopy axes to add the coastlines to.
     descriptor : Descriptor
         The descriptor containing the projection and dataset information.
     **kwargs
-       Additional keyword arguments to pass to ...
+       Additional keyword arguments. See
+       :py:class:`matplotlib.collections.Collection` for supported options.
     """
 
     if not isinstance(ax, GeoAxes):
