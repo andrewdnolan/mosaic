@@ -64,7 +64,10 @@ build-backend = "setuptools.build_meta"
 minversion = "6"
 addopts = ["-ra", "--showlocals", "--strict-markers", "--strict-config"]
 xfail_strict = true
-filterwarnings = ["error"]
+filterwarnings = [
+    "error",
+    "ignore:numpy.ndarray size changed:RuntimeWarning",
+]
 log_cli_level = "INFO"
 testpaths = ["tests"]
 
