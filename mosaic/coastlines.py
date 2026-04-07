@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import warnings
+
 import cartopy.feature as cfeature
 import numpy as np
 import shapely
@@ -32,6 +34,26 @@ def coastlines(
             "`mosaic.coastlines` to work. "
         )
         raise TypeError(msg)
+
+    if "edgecolor" in kwargs and "ec" in kwargs:
+        msg = "Cannot specify both 'edgecolor' and 'ec'."
+        raise TypeError(msg)
+    if "edgecolor" in kwargs:
+        color = kwargs.pop("edgecolor")
+    elif "ec" in kwargs:
+        color = kwargs.pop("ec")
+
+    if "facecolor" in kwargs and "fc" in kwargs:
+        msg = "Cannot specify both 'facecolor' and 'fc'."
+        raise TypeError(msg)
+    if "facecolor" in kwargs or "fc" in kwargs:
+        warnings.warn(
+            "'facecolor (fc)' is not supported for `mosaic.coastlines` "
+            "and will be ignored.",
+            stacklevel=2,
+        )
+        kwargs.pop("facecolor", None)
+        kwargs.pop("fc", None)
 
     kwargs["edgecolor"] = color
     kwargs["facecolor"] = "none"
