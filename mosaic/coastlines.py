@@ -71,7 +71,9 @@ class MPASCoastlineGenerator(MPASContourGenerator):
 
         return ContourGraph(vertex_1, vertex_2)
 
-    def _snap_lines_to_boundary(self, lines: np.ndarray) -> np.ndarray:
+    def _snap_lines_to_boundary(
+        self, lines: list[np.ndarray]
+    ) -> list[np.ndarray]:
         def snap(point: np.ndarray):
             return self.boundary.interpolate(
                 self.boundary.project(shapely.Point(point))
