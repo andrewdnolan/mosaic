@@ -79,9 +79,11 @@ class MPASCoastlineGenerator(MPASContourGenerator):
                 self.boundary.project(shapely.Point(point))
             )
 
-        for i, line in enumerate(lines):
+        complete_lines = []
+        for line in lines:
             # only need to snap lines that are not already closed loops
             if np.array_equal(line[0], line[-1]):
+                complete_lines.append(line)
                 continue
 
             contain_mask = shapely.contains_xy(self.domain, *line.T)
@@ -89,10 +91,18 @@ class MPASCoastlineGenerator(MPASContourGenerator):
                 continue
 
             clipped = line[contain_mask]
+
+            if len(clipped) == 1:
+                # if only one point inside domain,
+                # all snapped points will lie along the same line
+                continue
+
+            # TODO: For coastlines with end points outside domain it would be
+            # better to cut at boundary intersection point rather than snapping
             p0, p1 = snap(clipped[0]), snap(clipped[-1])
 
-            lines[i] = np.concatenate(
-                [np.array(p0.xy).T, clipped, np.array(p1.xy).T]
+            complete_lines.append(
+                np.concatenate([np.array(p0.xy).T, clipped, np.array(p1.xy).T])
             )
 
-        return lines
+        return complete_lines
