@@ -66,7 +66,7 @@ fig.colorbar(
     fraction=0.1,
     shrink=0.4,
     extend="both",
-    label="Topography [m a.s.l.]",
+    label="Bottom Depth [m]",
 );
 ```
 

@@ -61,11 +61,11 @@ def coastlines(
     generator = MPASCoastlineGenerator(descriptor)
     coastlines = generator.create_coastlines()
 
-    geometires = shapely.GeometryCollection(
+    geometries = shapely.GeometryCollection(
         [shapely.LineString(cl) for cl in coastlines]
     )
 
-    feature = cfeature.ShapelyFeature(geometires, descriptor.projection)
+    feature = cfeature.ShapelyFeature(geometries, descriptor.projection)
     ax.add_feature(feature, **kwargs)
 
 
@@ -79,7 +79,7 @@ class MPASCoastlineGenerator(MPASContourGenerator):
 
         shapely.prepare(self.domain)
 
-    def create_coastlines(self) -> np.ndarray:
+    def create_coastlines(self) -> list[np.ndarray]:
         graph = self._create_coastline_graph()
         lines = self._split_and_order_graph(graph)
 

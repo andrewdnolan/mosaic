@@ -103,8 +103,8 @@ class TestCoastlines:
         generator = MPASCoastlineGenerator(descriptor)
         coastlines = generator.create_coastlines()
 
-        geometires = shapely.GeometryCollection(
+        geometries = shapely.GeometryCollection(
             [shapely.LineString(cl) for cl in coastlines]
         )
 
-        assert all(line.is_simple for line in geometires.geoms)
+        assert all(line.is_simple for line in geometries.geoms)
