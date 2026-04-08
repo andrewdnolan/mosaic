@@ -386,32 +386,31 @@
     <span class="n">subplot_kw</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;projection&quot;</span><span class="p">:</span> <span class="n">projection</span><span class="p">},</span>
 <span class="p">)</span>
 
-<span class="n">cmap</span> <span class="o">=</span> <span class="n">cmocean</span><span class="o">.</span><span class="n">tools</span><span class="o">.</span><span class="n">crop</span><span class="p">(</span><span class="n">cmocean</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">topo</span><span class="p">,</span> <span class="o">-</span><span class="mf">5e3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
-
 <span class="c1"># create a `Descriptor` object which takes the mesh information and creates</span>
 <span class="c1"># the polygon coordinate arrays needed for `matplotlib.collections.PolyCollection`.</span>
 <span class="n">descriptor</span> <span class="o">=</span> <span class="n">mosaic</span><span class="o">.</span><span class="n">Descriptor</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">projection</span><span class="p">,</span> <span class="n">transform</span><span class="p">)</span>
 
 <span class="c1"># using the `Descriptor` object we just created, make a pseudocolor plot of</span>
-<span class="c1"># the &quot;indexToCellID&quot; variable, which is defined at cell centers.</span>
+<span class="c1"># the &quot;bottomDepth&quot; variable, which is defined at cell centers.</span>
 <span class="n">collection</span> <span class="o">=</span> <span class="n">mosaic</span><span class="o">.</span><span class="n">polypcolor</span><span class="p">(</span>
-    <span class="n">ax</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">,</span> <span class="o">-</span><span class="n">ds</span><span class="o">.</span><span class="n">bottomDepth</span><span class="p">,</span> <span class="n">antialiaseds</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span>
+    <span class="n">ax</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">bottomDepth</span><span class="p">,</span> <span class="n">antialiaseds</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmocean</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">deep</span>
 <span class="p">)</span>
 
-<span class="n">ax</span><span class="o">.</span><span class="n">coastlines</span><span class="p">(</span><span class="n">lw</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">add_feature</span><span class="p">(</span><span class="n">cfeature</span><span class="o">.</span><span class="n">LAND</span><span class="p">,</span> <span class="n">fc</span><span class="o">=</span><span class="s2">&quot;grey&quot;</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+<span class="c1"># plot the coastlines as resolved by the MPAS mesh</span>
+<span class="n">mosaic</span><span class="o">.</span><span class="n">coastlines</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">descriptor</span><span class="p">)</span>
+
 <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span>
     <span class="n">collection</span><span class="p">,</span>
     <span class="n">fraction</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
     <span class="n">shrink</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span>
     <span class="n">extend</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span>
-    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Topography [m a.s.l.]&quot;</span><span class="p">,</span>
+    <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Bottom Depth [m]&quot;</span><span class="p">,</span>
 <span class="p">);</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="../_images/63ba25c3662ba4f791839b1032067a97db7da0186f4c7138e362edfc1c05433e.png" src="../_images/63ba25c3662ba4f791839b1032067a97db7da0186f4c7138e362edfc1c05433e.png" />
+<img alt="../_images/737c10816b9afb1f5169cfa431f6effcbc5bb300c4f381a9b88808e36c7f0254.png" src="../_images/737c10816b9afb1f5169cfa431f6effcbc5bb300c4f381a9b88808e36c7f0254.png" />
 </div>
 </div>
 <p>For more information about how spherical meshes are handled and a list of supported
