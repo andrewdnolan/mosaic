@@ -725,7 +725,7 @@ def _compute_cell_patches(ds: Dataset) -> ndarray:
     # connectivity arrays have already been zero indexed
     verticesOnCell = ds.verticesOnCell
     # get a mask of the active vertices
-    mask = verticesOnCell == -1
+    mask = verticesOnCell < 0
 
     # tile the first vertices index
     firstVertex = np.tile(verticesOnCell[:, 0], (maxEdges, 1)).T
@@ -782,8 +782,8 @@ def _compute_vertex_patches(ds: Dataset) -> ndarray:
     cellsOnVertex = ds.cellsOnVertex.values
     edgesOnVertex = ds.edgesOnVertex.values
     # get a mask of active nodes
-    cellMask = cellsOnVertex == -1
-    edgeMask = edgesOnVertex == -1
+    cellMask = cellsOnVertex < 0
+    edgeMask = edgesOnVertex < 0
 
     # get the coordinates needed to patch construction
     xCell = ds.xCell.values

@@ -44,8 +44,10 @@ def _make_lookup_table(mask: np.ndarray[bool]) -> np.ndarray[np.int64]:
     old_idx = np.flatnonzero(mask)  # 0..N-1
     new_idx = np.arange(old_idx.size, dtype=np.int64)
 
-    # lut[0] reserved for old=-1
-    lut = np.full(mask.size + 1, -1, dtype=np.int64)
+    # make culling along projection boundary with -2
+    lut = np.full(mask.size + 1, -2, dtype=np.int64)
+    # culled land boundaries stay -1
+    lut[0] = -1
     lut[old_idx + 1] = new_idx
 
     return lut

@@ -16,6 +16,7 @@ Plotting
     :toctree: generated/
 
     polypcolor
+    coastlines
     contour
     contourf
 

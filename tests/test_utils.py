@@ -105,7 +105,7 @@ def test_padding_violation_raises_and_reports_cell():
     patches, vertices_on_cell = _compute_cell_patches(polys)
 
     # find a random 1-d index for a ragged node
-    idx = rng.choice(np.flatnonzero(vertices_on_cell == -1))
+    idx = rng.choice(np.flatnonzero(vertices_on_cell < 0))
 
     # map the 1-d index to the row/col of the ragged node
     i, j = np.unravel_index(idx, vertices_on_cell.shape)

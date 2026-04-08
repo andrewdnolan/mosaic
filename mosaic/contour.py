@@ -251,7 +251,7 @@ class MPASContourGenerator:
         self.ds = descriptor.ds
         self._z = np.asarray(array)
 
-        self.boundary_edge_mask = (self.ds.cellsOnEdge == -1).any("TWO").values
+        self.boundary_edge_mask = (self.ds.cellsOnEdge < 0).any("TWO").values
         self.boundary_vertices = np.unique(
             self.ds.verticesOnEdge[self.boundary_edge_mask]
         )
@@ -291,9 +291,9 @@ class MPASContourGenerator:
         """ """
         ds = self.ds
 
-        padded_mask = np.r_[False, mask]
+        padded_mask = np.r_[False, False, mask]
         # mark mask as False for all cells outside domain
-        cells_on_edge_mask = np.asarray(padded_mask[ds.cellsOnEdge + 1])
+        cells_on_edge_mask = np.asarray(padded_mask[ds.cellsOnEdge + 2])
 
         # boolean mask for edges along contour
         edge_mask = np.logical_xor.reduce(cells_on_edge_mask, axis=1)
