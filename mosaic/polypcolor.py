@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import numpy as np
-from cartopy.mpl.geoaxes import GeoAxes
 from matplotlib.axes import Axes
 from matplotlib.collections import PolyCollection
 from xarray.core.dataarray import DataArray
@@ -45,10 +44,6 @@ def _mirror_polycollection(ax, collection, descriptor, array, **kwargs):
     mirrored_collection.set_clim(vmin, vmax)
     # if vmin or vmax is None, use min/max from *orig* data to scale mirrored
     mirrored_collection.norm.autoscale_None(array)
-
-    # TODO: support wrapping for spherical meshes
-    if isinstance(ax, GeoAxes):
-        mirrored_collection.set_transform(descriptor.transform)
 
     # add the mirrored collection to the axes
     ax.add_collection(mirrored_collection)
@@ -98,10 +93,6 @@ def polypcolor(
     norm = kwargs.pop("norm", None)
 
     collection = PolyCollection(verts, array=array, norm=norm, **kwargs)
-
-    # only set the transform if GeoAxes
-    if isinstance(ax, GeoAxes):
-        collection.set_transform(descriptor.transform)
 
     collection._scale_norm(norm, vmin, vmax)
     ax.add_collection(collection)
