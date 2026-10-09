@@ -16,7 +16,6 @@ def wireframe(
     ax: Axes,
     descriptor: Descriptor,
     location: point_types = "Cell",
-    *args,
     **kwargs,
 ) -> list[mlines.Line2D]:
     """Draw a wireframe (an outline of the mesh topology) on the given axes.
@@ -35,7 +34,7 @@ def wireframe(
     location : Cell, Edge, or Vertex
         Location to plot wireframe of. Default is "Cell".
     other_parameters
-        All other args and kwargs are forwarded to `~matplotlib.Axes.plot`.
+        All other kwargs are forwarded to `~matplotlib.Axes.plot`.
 
     Returns
     -------
@@ -49,13 +48,11 @@ def wireframe(
         err = "mosaic.wireframe does not support periodic meshes, yet."
         raise NotImplementedError(err)
 
-    # insert plot format string into copy of kwargs (kwarg values prevail).
     kw = cbook.normalize_kwargs(kwargs, mlines.Line2D)
 
     # Plot lines and markers separately to avoid duplicate markers on shared vertices
     linestyle = kw.get("linestyle", "-")
     kw_lines = kw | {
-        **kw,
         "marker": "None",  # No marker to draw.
         "zorder": kw.get("zorder", 1),  # Path default zorder is used.
     }
@@ -71,10 +68,13 @@ def wireframe(
         wireframe_lines = ax.plot([], [], **kw_lines)
 
     marker = kw.get("marker", None)
-    kw_markers = {
-        **kw,
-        "linestyle": "None",  # No line to draw.
-    }
+    kw_markers = (
+        {"color": wireframe_lines[0].get_color()}
+        | kw
+        | {
+            "linestyle": "None",  # No line to draw.
+        }
+    )
     kw_markers.pop("label", None)
 
     if marker not in [None, "None", "", " "]:
