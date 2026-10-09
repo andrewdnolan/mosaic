@@ -250,7 +250,7 @@ def compute_vertex_wireframe(ds: Dataset) -> tuple[ndarray, ndarray]:
     """Construct line segments connecting neighboring cell centers across edges.
 
     On boundaries, segments connect cell centers to edge midpoints, and the
-    outer edges close the perimter of the dual cells.
+    outer edges close the perimeter of the dual cells.
 
     Parameters
     ----------

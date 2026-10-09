@@ -18,7 +18,7 @@ def wireframe(
     location: point_types = "Cell",
     *args,
     **kwargs,
-) -> None:
+) -> list[mlines.Line2D]:
     """Draw a wireframe (an outline of the mesh topology) on the given axes.
 
     If the "marker" keyword argument is provided, markers are drawn at the nodes
@@ -39,17 +39,14 @@ def wireframe(
 
     Returns
     -------
-    lines : `~matplotlib.lines.Line2D`
-        The drawn wireframe lines.
-
-    marker : `~matplotlib.lines.Line2D`
-        The drawn wireframe markers.
+    artists : list[~matplotlib.lines.Line2D]
+        The wireframe line and marker artists.
     """
 
     # TODO: Periodic mesh extension (inverse of spherical meshes culling),
     #       will enable wireframe plotting for periodic meshes.
     if descriptor.is_periodic:
-        err = "mosaic.wireframe does not supported for periodic meshes, yet."
+        err = "mosaic.wireframe does not support periodic meshes, yet."
         raise NotImplementedError(err)
 
     # insert plot format string into copy of kwargs (kwarg values prevail).
