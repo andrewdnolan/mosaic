@@ -4,6 +4,13 @@ kernelspec:
   name: python3
 ---
 
+```{code-cell} ipython3
+---
+tags: [remove-cell]
+---
+%config InlineBackend.figure_formats = ['svg']
+```
+
 # Wireframes
 
 `mosaic` can draw the connectivity of an MPAS mesh using
