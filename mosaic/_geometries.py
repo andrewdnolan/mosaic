@@ -281,7 +281,7 @@ def compute_boundary_wireframe(ds: Dataset) -> tuple[ndarray, ndarray]:
     """Construct line segments for the outer boundary split at edge midpoints.
 
     Splitting edges at midpoints ensures edge positions are included for
-    wireframe markers.
+    vertex wireframe markers.
 
     Parameters
     ----------

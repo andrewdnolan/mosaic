@@ -48,7 +48,7 @@ def wireframe(
 
     # TODO: Periodic mesh extension (inverse of spherical meshes culling),
     #       will enable wireframe plotting for periodic meshes.
-    if descriptor.ds.is_periodic:
+    if descriptor.is_periodic:
         err = "mosaic.wireframe does not supported for periodic meshes, yet."
         raise NotImplementedError(err)
 
